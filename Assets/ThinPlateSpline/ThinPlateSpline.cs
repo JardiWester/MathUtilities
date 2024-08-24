@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using DelaunatorSharp;
+using DelaunatorSharp.Unity.Extensions;
 
 public class ThinPlateSpline : MonoBehaviour {
   public Transform[] controlPoints;
@@ -31,7 +33,30 @@ public class ThinPlateSpline : MonoBehaviour {
       _internalPoints[i] = controlPoints[i].position;
     }
 
-    // Draw Grid
+    Vector2[] uvPoints = new Vector2[204];
+    for(int i = 0; i < 50; i ++) {
+      uvPoints[i    ] = new Vector2(Random.value > 0.5f ? 1.0f : 0.0f, Random.value);
+    }
+    for(int i = 0; i < 50; i ++) {
+      uvPoints[i+ 50] = new Vector2(Random.value, Random.value > 0.5f ? 1.0f : 0.0f);
+    }
+    for(int i = 0; i < 100; i ++) {
+      uvPoints[i+100] = new Vector2(Random.value, Random.value);
+    }
+    uvPoints[200] = new Vector2(0f, 0f);
+    uvPoints[201] = new Vector2(1f, 0f);
+    uvPoints[202] = new Vector2(0f, 1f);
+    uvPoints[203] = new Vector2(1f, 1f);
+
+    Delaunator delaunay = new Delaunator(uvPoints.ToPoints());
+    foreach(Edge edge in delaunay.GetEdges()) {
+      Gizmos.DrawLine(
+        q_transform(_internalPoints, (float)edge.P.X, (float)edge.P.Y), 
+        q_transform(_internalPoints, (float)edge.Q.X, (float)edge.Q.Y));
+    }
+  }
+}
+    /*// Draw Grid
     int numSegments = 20;
     for(int xi = 0; xi <= numSegments; xi += 1) {
       for (int yi = 0; yi <= numSegments; yi += 1) {
@@ -46,6 +71,6 @@ public class ThinPlateSpline : MonoBehaviour {
           Gizmos.DrawLine(curPos, nextY);
         }
       }
-    }
-  }
-}
+    }*/
+//  }
+//}
